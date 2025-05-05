@@ -11,11 +11,11 @@ class NotebookTile extends StatelessWidget {
 
   // Konstruktor przyjmujący obowiązkowe parametry i przekazujący je dalej do klasy bazowej.
   const NotebookTile({
-    Key? key,
+    super.key,
     required this.notebook,
     required this.onTap,
     required this.onLongPress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) { 

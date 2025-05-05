@@ -6,7 +6,7 @@ import 'routes.dart';
 void main(){
   runApp(
   ChangeNotifierProvider(
-    create: (context) => NotebooksModel(),
+    create: (_) => NotebooksModel(),
     child: const MainApp(),
     ),
   );

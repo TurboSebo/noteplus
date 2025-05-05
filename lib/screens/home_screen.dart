@@ -40,17 +40,18 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          print('Dodaję nowy notatnik');
-          String? newTitle; // Zmienna do przechowywania wpisanego tytułu
+          print('Okno dialogowe o dodaniu notatnika');
+          // Pobieramy model wcześniej (zanim wejdziemy w async)
+          final notebooksModel = context.read<NotebooksModel>();
+
+          String? newTitle;
           final title = await showDialog<String>(
             context: context,
             builder: (context) => AlertDialog(
               title: const Text('Dodaj nowy notatnik'),
               content: TextField(
                 decoration: const InputDecoration(hintText: 'Nazwa notatnika'),
-                // Gdy użytkownik wpisuje tekst, zapisujemy go do newTitle
                 onChanged: (value) => newTitle = value,
-                // Wciśnięcie Entera skończy wprowadzanie tytułu
                 onSubmitted: (value) => Navigator.pop(context, value),
               ),
               actions: [
@@ -58,7 +59,6 @@ class HomeScreen extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Anuluj'),
                 ),
-                // Tutaj finalizujemy wprowadzony tekst przyciskiem "Dodaj"
                 TextButton(
                   onPressed: () => Navigator.pop(context, newTitle),
                   child: const Text('Dodaj'),
@@ -66,10 +66,9 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           );
-          // Sprawdzamy, czy tytuł nie jest pusty
+
           if (title != null && title.isNotEmpty) {
-            // Tutaj można np. dodać notatnik do modelu:
-            // model.addNotebook(Notebook(title: title, ...));
+            notebooksModel.addNotebook(title.trim());
           }
         },
         child: const Icon(Icons.add),
