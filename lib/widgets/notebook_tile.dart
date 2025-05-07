@@ -18,13 +18,42 @@ class NotebookTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) { 
-    return ListTile( // ListTile to gotowy widget do wyświetlania tytułu, podtytułu i obsługi kliknięć.
-      title: Text(notebook.title), // Główny tytuł notatnika. Używamy notebook.name, żeby wyświetlić nazwę notatnika.
-      trailing: Icon(Icons.chevron_right), // Ikona strzałki wskazująca, że można kliknąć.
-      onTap: onTap,// Obsługa kliknięcia.
-      onLongPress: onLongPress,      // Obsługa dłuższego przytrzymania.
+  Widget build(BuildContext context) {
+    final color = Colors.blueGrey;
 
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4.0,
+              offset: const Offset(2, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.book, color: Colors.white), // Ikona notatnika
+            const SizedBox(height: 8.0), // Odstęp między ikoną a tytułem
+            Text(
+              notebook.title,
+              style: const TextStyle(color: Colors.white, fontSize: 18.0),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
+  
 }
