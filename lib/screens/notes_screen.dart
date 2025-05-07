@@ -14,6 +14,9 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     appBar: AppBar(title: Text(notebook.title)),
+    drawer: const Drawer(
+        child: SafeArea(child: Text('Tu będzie menu')),
+    ),
     body: const Center(child: Text('tu będzie lista notatek')),
 
 
