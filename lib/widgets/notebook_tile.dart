@@ -19,7 +19,7 @@ class NotebookTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Colors.blueGrey;
+    final color = notebook.color; // Pobieramy kolor notatnika.
 
     return GestureDetector(
       onTap: onTap,

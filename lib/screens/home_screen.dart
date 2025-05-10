@@ -4,6 +4,17 @@ import 'package:provider/provider.dart';
 import '../models/notebook.dart';
 import '../providers/notebooks_model.dart';
 
+const List<Color> kNotebookColors = [
+  Color(0xFF81D4FA), // błękitny
+  Color(0xFF2196F3), // niebieski
+  Color(0xFFB2FF59), // jasnozielony
+  Color(0xFF9E9E9E), // szary
+  Color(0xFFFFA726), // pomarańczowy
+  Color(0xFF4CAF50), // zielony
+  Color(0xFF424242), // ciemnoszary
+  Color(0xFF9C27B0), // purpurowy
+];
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -80,43 +91,76 @@ class HomeScreen extends StatelessWidget {
           print('Okno dialogowe o dodaniu notatnika');
           // Pobieramy instancję NotebooksModel, aby dodać nowy notatnik
           final notebooksModel = context.read<NotebooksModel>();
+          final controller = TextEditingController();
+          Color? selectedColor = kNotebookColors[0]; // Domyślny kolor notatnika
 
           String? newTitle;
           // Wyświetlamy okno dialogowe z polem tekstowym do wpisania nazwy notatnika
+          
           final title = await showDialog<String>(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Dodaj nowy notatnik'),
-              content: TextField(
-                decoration:
-                    const InputDecoration(hintText: 'Nazwa notatnika'),
-                // Aktualizujemy zmienną newTitle z bieżącą wartością wpisaną przez użytkownika
-                onChanged: (value) => newTitle = value,
-                // Umożliwiamy zatwierdzenie wpisanej nazwy przez przycisk Enter
-                onSubmitted: (value) => Navigator.pop(context, value),
-              ),
-              actions: [
-                // Przycisk "Anuluj" – zamyka okno dialogowe bez dodawania notatnika
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Anuluj'),
-                ),
-                // Przycisk "Dodaj" – zamyka dialog i zwraca wpisaną nazwę
-                TextButton(
-                  onPressed: () => Navigator.pop(context, newTitle),
-                  child: const Text('Dodaj'),
-                ),
-              ],
-            ),
-          );
+            builder: (ctx){
+              return StatefulBuilder(builder: (ctx, setState){
+                return AlertDialog(
+                  title: const Text('Dodaj nowy notatnik'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Tytuł notatnika',
+                        ),
+                        autofocus: true,
+                      ),
+                      const SizedBox(height: 16),
+                      // Wyświetlamy kolory do wyboru
+                      Wrap(
+                        spacing: 8.0,
+                        children: kNotebookColors.map((color) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedColor = color; // Ustawiamy wybrany kolor
+                              });
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: color,
+                              radius: 20,
+                              child: selectedColor == color
+                                  ? const Icon(Icons.check, color: Colors.white)
+                                  : null,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx), // Zamykamy okno dialogowe
+                      child: const Text('Anuluj'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        newTitle = controller.text.trim(); // Pobieramy tytuł z pola tekstowego
+                        Navigator.pop(ctx, newTitle); // Zamykamy okno dialogowe i zwracamy tytuł
+                      },
+                      child: const Text('Dodaj'),
+                    ),
+                  ],
+                ); // Zamknięcie AlertDialog
+              }); // Zamknięcie StatefulBuilder
+            }, // Zamknięcie builder w showDialog
+          ); // Zamknięcie showDialog
 
           // Jeśli użytkownik wpisał poprawną nazwę, dodajemy notatnik do modelu
           if (title != null && title.isNotEmpty) {
-            notebooksModel.addNotebook(title.trim());
+            notebooksModel.addNotebook(title.trim(), selectedColor!);
           }
-        },
+        }, // Zamknięcie onPressed FloatingActionButton
         child: const Icon(Icons.add),
-      ),
+      ), 
     );
-  }
-}
+  } // Zamknięcie build
+} // Zamknięcie HomeScreen
