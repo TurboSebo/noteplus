@@ -1,49 +1,49 @@
 import 'package:flutter/material.dart';
 import '../models/notebook.dart';
-import 'package:flutter/foundation.dart'; // Import podstawowych narzędzi Fluttera
+import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
-// Klasa NotebooksModel zarządza listą notatników. Dziedziczy po ChangeNotifier, co umożliwia informowanie widżetów o zmianach w stanie.
-class NotebooksModel extends ChangeNotifier {
-  final List<Notebook> _notebooks = [];   // Prywatna lista notatników. Nazwa zaczynająca się od "_" oznacza, że zmienna jest prywatna.
+class NotebooksModel extends ChangeNotifier { ///NotebooksModel zarządza kolekcją notatników i synchronizuje je z lokalną bazą Hive.
+
+  late final Box<Notebook> _notebooksBox;   // Pudełko Hive przechowujące obiekty Notebook.
   
-  NotebooksModel() {
-    print('NotebooksModel: _notebooks: $_notebooks'); // Debugowanie - wyświetlenie zawartości listy notatników w konsoli.
+  NotebooksModel() {   // Konstruktor inicjalizuje pudełko Hive i ładuje istniejące notatniki.
+    _notebooksBox = Hive.box<Notebook>('notebooks');    //  zwraca otwarte pudełko o nazwie 'notebooks'.
+    print('Loaded notebooks: ${_notebooksBox.values}'); //wyświetlenie załadowanych notatników w konsoli.
   }
-  // Getter, który zwraca niezmienną listę notatników. Dzięki temu nie można zmienić listy bezpośrednio spoza tej klasy.
-  List<Notebook> get notebooks => List.unmodifiable(_notebooks);
 
-  // Metoda dodaje nowy notatnik do listy. title - tytuł notatnika, który chcemy dodać.
-  // Po dodaniu wywoływana jest metoda notifyListeners(), która informuje widżety o aktualizacji.
-  void addNotebook(String title, Color color) {   // Metoda dodaje nowy notatnik do listy. title - tytuł notatnika, który chcemy dodać.
-    try {
-      if (title.isEmpty) {   // Sprawdzamy, czy tytuł nie jest pusty. Jeśli tak, rzucamy wyjątek.
+    List<Notebook> get notebooks => _notebooksBox.values.toList();   // Zwraca listę notatników jako niemodyfikowalną listę.
+
+  void addNotebook(String title, Color color) {
+    try {   // Walidacja: tytuł nie może być pusty ani za długi.
+      if (title.isEmpty) {   
         throw Exception('Title cannot be empty');
       }
-      if (title.length > 20) {   // Sprawdzamy, czy tytuł nie jest za długi. Jeśli tak, rzucamy wyjątek.
+      if (title.length > 20) {
         throw Exception('Title cannot be longer than 20 characters');
       }
     } catch (e) {
-      print('Error: $e');   // W przypadku błędu wyświetlamy go w konsoli.
-      return;   // Zatrzymujemy dalsze wykonywanie metody, aby nie dodawać notatnika z błędnym tytułem.
+      print('Error: $e');  // W razie błędu wyświetlamy go w konsoli i przerywamy operację.
+      return;
     }
-    final notebook = Notebook.create(title, color);     // Tworzymy nowy notatnik przy pomocy metody fabrycznej Notebook.create. Przekazujemy tytuł jako argument, a metoda generuje unikalny identyfikator.
-    _notebooks.add(notebook);     // Dodajemy nowy notatnik do prywatnej listy.
-    notifyListeners(); // Powiadamiamy wszystkie widżety nasłuchujące zmiany o zaktualizowaniu listy.
+    final nb = Notebook.create(title, color);     // Tworzymy nowy obiekt Notebook z unikalnym ID i zadanym kolorem.
+    _notebooksBox.put(nb.id, nb);     // Zapisujemy obiekt w pudełku Hive pod kluczem równym jego ID.
+    notifyListeners();  /* notifyListeners() informuje wszystkie widżety nasłuchujące o zmianie stanu. 
+    Dzięki temu widżety mogą się zaktualizować i odzwierciedlić zmiany w interfejsie użytkownika.  
+    notifyListeners() jest wywoływane po każdej zmianie w modelu, aby zaktualizować widżety. */
   }
     
-  void removeNotebook(String id) {   // Metoda usuwa notatnik z listy. id - unikalny identyfikator notatnika, który ma zostać usunięty. Po usunięciu również informujemy widżety o zmianie stanu.
+  void removeNotebook(String id) { // Metoda do usuwania notatnika na podstawie jego ID.
     try {
-      if (id.isEmpty) {   // Sprawdzamy, czy id nie jest puste. Jeśli tak, rzucamy wyjątek.
+      if (id.isEmpty) {
         throw Exception('ID cannot be empty');
       }
     } catch (e) {
-      print('Error: $e');   
-      return;  
+      print('Error: $e');
+      return;
     }
-    _notebooks.removeWhere((notebook) => notebook.id == id);     // Usuwamy notatnik, którego id pasuje do podanego argumentu.
-    notifyListeners();     /* notifyListeners() informuje wszystkie widżety nasłuchujące o zmianie stanu. 
-    Dzięki temu widżety mogą się zaktualizować i odzwierciedlić zmiany w interfejsie użytkownika.  
-    notifyListeners() jest wywoływane po każdej zmianie w modelu, aby zaktualizować widżety. */
-
+    _notebooksBox.delete(id);
+    notifyListeners(); // Powiadamiamy nasłuchujące widgety o zmianie danych.
   }
 }
