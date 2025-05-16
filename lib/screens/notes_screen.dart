@@ -6,6 +6,7 @@ import '../providers/notebooks_model.dart';
 import '../providers/notes_model.dart';               // NotesModel – logika dodawania/usuwania notatek
 import 'package:hive/hive.dart';                      // Hive – lokalna baza danych
 import 'package:hive_flutter/hive_flutter.dart';      // Rozszerzenie Hive dla Fluttera
+import 'note_detail_screen.dart';
 
 class NotesScreen extends StatelessWidget {
   final String notebookId;                            // ID notatnika, dla którego pokazujemy notatki
@@ -89,13 +90,27 @@ class NotesScreen extends StatelessWidget {
                     },
                     child: ListTile(
                       title: Text(
-                        note.content,                // Wyświetlamy treść notatki
-                        maxLines: 2, 
+                        note.content,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
                         note.createdAt.toString(),   // Opcjonalnie pokazujemy czas utworzenia
                       ),
+                      onTap: () {
+                          final notesModel = context.read<NotesModel>();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ChangeNotifierProvider.value(
+                                value: notesModel,
+                                child: NoteDetailScreen(
+                                  noteId: note.id,
+                                  notebookId: notebookId,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                     ),
                   );
                 },

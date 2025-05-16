@@ -22,7 +22,13 @@ class NotebookTile extends StatelessWidget {
     final color = notebook.color; // Pobieramy kolor notatnika.
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: (){
+        Navigator.pushNamed(
+          context,
+          '/notes',
+          arguments: notebook.id, // Przekazujemy ID notatnika do ekranu notatek.
+        );
+      },
       onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.all(12.0),
