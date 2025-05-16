@@ -23,7 +23,7 @@ class Notebook extends HiveObject {
   // Metoda fabryczna do tworzenia obiektu Notebook z unikatowym ID.
   factory Notebook.create(String title, Color color) {
     return Notebook(
-      id: const Uuid().v4(),
+      id: const Uuid().v4(), // Generuje unikalny identyfikator UUID dla notatnika. Używamy metody v4() z pakietu uuid, aby uzyskać losowy identyfikator.
       title: title,
       colorValue: color.value,
     );

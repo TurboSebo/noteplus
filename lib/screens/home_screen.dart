@@ -45,8 +45,10 @@ class HomeScreen extends StatelessWidget {
             final notebook = model.notebooks[index];  // Pobieramy pojedynczy notatnik z listy na danej pozycji
             return NotebookTile(
               notebook: notebook, 
-              onTap: () { // Callback wywoływany przy krótkim dotknięciu kafelka
+              onTap: () {
+                // Otwieramy ekran z notatkami, przekazując notebook.id jako argument
                 print('Otwieram notatnik ${notebook.title}');
+                Navigator.pushNamed(context, '/notes', arguments: notebook.id);
               },
               onLongPress: () {   // Callback wywoływany przy długim przytrzymaniu kafelka
                 showDialog(  // Wyświetlamy okno dialogowe potwierdzające usunięcie notatnika
