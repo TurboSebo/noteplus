@@ -55,21 +55,29 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Edytuj notatkę'),
-            actions: [
-              // Usunięto ręczny przycisk zapisu; zapis następuje przy wychodzeniu
-             ],
+            title: const Text('Edytuj notatkę'),
+            // ...inne akcje...
           ),
           body: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // wyrównanie do lewej
               children: [
+                // Pogrubiony tytuł notatki na górze
+                Text(
+                  _note.title,
+                  style: const TextStyle(
+                    fontSize: 24,               // większa czcionka
+                    fontWeight: FontWeight.bold // pogrubienie
+                  ),
+                ),
+                const SizedBox(height: 16),    // odstęp pod tytułem
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     maxLines: null,
                     expands: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Wpisz treść notatki',
                       border: InputBorder.none,
                     ),

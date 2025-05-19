@@ -13,29 +13,29 @@ class NotesScreen extends StatelessWidget {
 
   const NotesScreen({Key? key, required this.notebookId}) : super(key: key);
 
-  /// Pokazuje dialog z polem tekstowym i zwraca wpisaną wartość (lub null, jeśli anulowano)
+  /// Zwraca wpisany tytuł notatki (lub null, jeśli anulowano).
   Future<String?> _showAddDialog(BuildContext ctx) {
-    final controller = TextEditingController();       // Kontroler do odczytu wpisu w TextField
+    final controller = TextEditingController();
     return showDialog<String>(
       context: ctx,
       builder: (dCtx) {
         return AlertDialog(
-          title: const Text('Dodaj notatkę'),         // Nagłówek okna
+          title: const Text('Dodaj nową notatkę'),
           content: TextField(
-            controller: controller,                   // Podpinamy kontroler
+            controller: controller,
             decoration: const InputDecoration(
-              hintText: 'Wpisz treść notatki',        // Podpowiedź w polu
+              labelText: 'Tytuł notatki',
+              hintText: 'Wpisz tytuł notatki',
             ),
-            autofocus: true,                          // Od razu otwiera klawiaturę
+            autofocus: true, // od razu focus na pole tekstowe
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dCtx),   // Anuluj: zamykamy dialog bez zwracania wartości
+              onPressed: () => Navigator.pop(dCtx), // anuluj
               child: const Text('Anuluj'),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(dCtx, controller.text.trim()),  
-                                                       // Zatwierdź: zwracamy wpisaną treść
+              onPressed: () => Navigator.pop(dCtx, controller.text.trim()), 
               child: const Text('Dodaj'),
             ),
           ],
@@ -90,7 +90,8 @@ class NotesScreen extends StatelessWidget {
                     },
                     child: ListTile(
                       title: Text(
-                        note.content,
+                        note.title,
+                        style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -120,12 +121,11 @@ class NotesScreen extends StatelessWidget {
           // Przyciski dodawania nowej notatki
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
-              // Otwieramy dialog do wpisania treści i czekamy na wynik
-              final content = await _showAddDialog(context);
-              if (content != null && content.isNotEmpty) {
-                // Dodajemy notatkę przez model stanu
-                context.read<NotesModel>().addNote(content);
-                // Informujemy użytkownika, że dodano notatkę
+              // Pokazujemy okno dialogowe i czekamy na wpisanie 'title'
+              final title = await _showAddDialog(context);
+              if (title != null && title.isNotEmpty) {
+                // Dodajemy notatkę z podanym tytułem
+                context.read<NotesModel>().addNote(title);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Notatka dodana')),
                 );

@@ -12,27 +12,32 @@ class Note extends HiveObject {
   @HiveField(1) // Identyfikator notatnika, do którego należy notatka
   String notebookId;
 
-  @HiveField(2) // Treść notatki
+  @HiveField(2) // Tytuł notatki
+  String title;
+
+  @HiveField(3) // Treść notatki
   String content;
 
-  @HiveField(3) // Data utworzenia notatki
+  @HiveField(4) // Data utworzenia notatki
   DateTime createdAt;
 
   Note({
     required this.id,
     required this.notebookId,
+    required this.title,
     required this.content,
     required this.createdAt,
   });
 
   // Metoda fabryczna do tworzenia obiektu Note z unikatowym ID.
   // Dodaliśmy parametr notebookId, aby przypisać notatkę do odpowiedniego notatnika.
-  factory Note.create(String notebookId, String content) {
+  factory Note.create(String notebookId, String title) {
     final now = DateTime.now();
     return Note(
       id: const Uuid().v4(), // Generujemy unikatowy identyfikator
       notebookId: notebookId, // Przypisujemy identyfikator notatnika
-      content: content,
+      title: title,
+      content: '',
       createdAt: now,
     );
   }

@@ -19,8 +19,8 @@ class NotesModel extends ChangeNotifier {
       .toList()
     ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-  void addNote(String content) {
-    final note = Note.create(_notebookId, content);
+  void addNote(String title) {
+    final note = Note.create(_notebookId, title);
     _notesBox.add(note);
     notifyListeners();
   }
