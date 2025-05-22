@@ -20,7 +20,7 @@ class NoteAdapter extends TypeAdapter<Note> {
       id: fields[0] as String,
       notebookId: fields[1] as String,
       title: fields[2] as String,
-      content: fields[3] as String,
+      docJson: fields[3] as String,
       createdAt: fields[4] as DateTime,
     );
   }
@@ -36,7 +36,7 @@ class NoteAdapter extends TypeAdapter<Note> {
       ..writeByte(2)
       ..write(obj.title)
       ..writeByte(3)
-      ..write(obj.content)
+      ..write(obj.docJson)
       ..writeByte(4)
       ..write(obj.createdAt);
   }

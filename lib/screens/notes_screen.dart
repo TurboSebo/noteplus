@@ -4,8 +4,7 @@ import '../models/notebook.dart';
 import '../models/note.dart';                         // Model Note (pojedyncza notatka)
 import '../providers/notebooks_model.dart';
 import '../providers/notes_model.dart';               // NotesModel – logika dodawania/usuwania notatek
-import 'package:hive/hive.dart';                      // Hive – lokalna baza danych
-import 'package:hive_flutter/hive_flutter.dart';      // Rozszerzenie Hive dla Fluttera
+import 'package:hive/hive.dart'; // Hive – lokalna baza danych
 import 'note_detail_screen.dart';
 
 class NotesScreen extends StatelessWidget {
