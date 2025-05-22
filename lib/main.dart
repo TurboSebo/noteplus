@@ -7,6 +7,7 @@ import 'routes.dart';
 import 'models/note.dart';
 import 'models/block.dart';
 import 'package:flutter_quill/flutter_quill.dart'; // import Quill dla edytora tekstu
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async{
 
@@ -37,6 +38,15 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'), // dostosuj do potrzebnych języków
+      ],
       title: 'NotePlus',
       onGenerateRoute: generateRoute,
       theme: ThemeData(
