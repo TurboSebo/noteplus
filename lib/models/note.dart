@@ -23,12 +23,16 @@ String docJson;  // Quill JSON: zapisuje strukturę dokumentu
   @HiveField(4) // Data utworzenia notatki
   DateTime createdAt;
 
+@HiveField(5) 
+String? audioPath;  // ścieżka do pliku nagrania, null jeśli brak
+
   Note({
     required this.id,
     required this.notebookId,
     required this.title,
     required this.docJson,
     required this.createdAt,
+    this.audioPath,
   });
 
   // Metoda fabryczna do tworzenia obiektu Note z unikatowym ID.

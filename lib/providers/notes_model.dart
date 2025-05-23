@@ -29,4 +29,21 @@ class NotesModel extends ChangeNotifier {
     note.delete();
     notifyListeners();
   }
+  void updateNote(Note note) {
+    note.save();
+    notifyListeners();
+  }
+  /// Dodaje notatkę głosową z podaną ścieżką i tytułem
+  void addVoiceNote(String filePath, String title) {
+    final note = Note.create(_notebookId, title);
+    note.audioPath = filePath;
+    _notesBox.add(note);
+    notifyListeners();
+  }
+  void deleteVoiceNote(Note note) {
+    note.audioPath = null; // lub inna logika usuwania
+    note.save();
+    notifyListeners();
+  }
+
 }

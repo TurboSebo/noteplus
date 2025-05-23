@@ -1,11 +1,14 @@
+import 'package:hive/hive.dart'; 
 import 'package:flutter/material.dart';               // Flutterowy zestaw widgetów i narzędzi UI
 import 'package:provider/provider.dart';              // Provider – zarządzanie stanem
 import '../models/notebook.dart';
 import '../models/note.dart';                         // Model Note (pojedyncza notatka)
 import '../providers/notebooks_model.dart';
 import '../providers/notes_model.dart';               // NotesModel – logika dodawania/usuwania notatek
-import 'package:hive/hive.dart'; // Hive – lokalna baza danych
 import 'note_detail_screen.dart';
+import 'voice_note_screen.dart';            // dodaj import
+import 'package:just_audio/just_audio.dart';
+
 
 class NotesScreen extends StatelessWidget {
   final String notebookId;                            // ID notatnika, dla którego pokazujemy notatki
@@ -71,33 +74,62 @@ class NotesScreen extends StatelessWidget {
                 separatorBuilder: (_, __) => const Divider(),
                 itemBuilder: (_, idx) {
                   final note = notes[idx];
-                  // Każdy element można przesunąć w bok, by go usunąć
                   return Dismissible(
-                    key: ValueKey(note.id),           // Unikalny klucz
-                    background: Container(             // Czerwone tło z ikoną „usuń”
+                    key: ValueKey(note.id),
+                    background: Container(
                       color: Colors.red,
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 16.0),
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
                     onDismissed: (_) {
-                      notesModel.deleteNote(note);     // Usuwamy notatkę z modelu
-                      // Pokazujemy krótką informację o usunięciu
+                      notesModel.deleteNote(note);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Notatka usunięta')),
                       );
                     },
                     child: ListTile(
+                      leading: Icon(
+                        note.audioPath != null ? Icons.mic : Icons.description,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       title: Text(
                         note.title,
-                        style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
-                        note.createdAt.toString(),   // Opcjonalnie pokazujemy czas utworzenia
+                        '${note.createdAt}\n${note.audioPath != null ? "Ścieżka: ${note.audioPath}" : ""}',
+                        style: const TextStyle(fontSize: 12),
                       ),
-                      onTap: () {
+                      isThreeLine: note.audioPath != null,
+                      onTap: () async {
+                        if (note.audioPath != null) {
+                          // Odtwarzanie notatki głosowej
+                          final player = AudioPlayer();
+                          try {
+                            await player.setFilePath(note.audioPath!);
+                            player.play();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Odtwarzanie notatki głosowej'))
+                            );
+                            // Automatyczne zamknięcie playera po zakończeniu
+                            player.playerStateStream.listen((state) {
+                              if (state.processingState == ProcessingState.completed) {
+                                player.dispose();
+                              }
+                            });
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Błąd odtwarzania: $e'))
+                            );
+                            player.dispose();
+                          }
+                        } else {
                           final notesModel = context.read<NotesModel>();
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -110,27 +142,52 @@ class NotesScreen extends StatelessWidget {
                               ),
                             ),
                           );
-                        },
+                        }
+                      },
                     ),
                   );
                 },
               );
             },
           ),
-          // Przyciski dodawania nowej notatki
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              // Pokazujemy okno dialogowe i czekamy na wpisanie 'title'
-              final title = await _showAddDialog(context);
-              if (title != null && title.isNotEmpty) {
-                // Dodajemy notatkę z podanym tytułem
-                context.read<NotesModel>().addNote(title);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notatka dodana')),
-                );
-              }
-            },
-            child: const Icon(Icons.add),       // Ikona plusika
+          // Przyciski dodawania nowej notatki (tekstowej i głosowej)
+          floatingActionButton: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton(
+                heroTag: 'textNote',
+                onPressed: () async {
+                  // Dodawanie notatki tekstowej
+                  final title = await _showAddDialog(context);
+                  if (title != null && title.isNotEmpty) {
+                    context.read<NotesModel>().addNote(title);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Notatka dodana')),
+                    );
+                  }
+                },
+                tooltip: 'Nowa notatka',
+                child: const Icon(Icons.add),
+              ),
+              const SizedBox(height: 16),
+              FloatingActionButton(
+  heroTag: 'voiceNote',
+  onPressed: () {
+    final notesModel = context.read<NotesModel>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => ChangeNotifierProvider.value(
+          value: notesModel,
+          child: VoiceNoteScreen(notebookId: notebookId),
+        ),
+      ),
+    );
+  },
+  tooltip: 'Nowa notatka głosowa',
+  child: const Icon(Icons.mic),
+),
+
+            ],
           ),
         );
       },
