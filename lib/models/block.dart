@@ -3,6 +3,9 @@ import 'package:hive/hive.dart';
 
 part 'block.g.dart';
 
+//nieużywane
+//początkowo planowano różne typy bloków, ale obecnie mam tylko tekst i audio
+
 @HiveType(typeId: 2)
 enum BlockType {
   @HiveField(0)

@@ -17,13 +17,13 @@ class NoteDetailScreen extends StatefulWidget {
   _NoteDetailScreenState createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen>
-    with WidgetsBindingObserver {
-  late quill.QuillController _controller;
-  late Note _note;
+class _NoteDetailScreenState extends State<NoteDetailScreen> // Stan dla ekranu szczegółów notatki
+    with WidgetsBindingObserver {   // Implementacja WidgetsBindingObserver pozwala na reagowanie na zmiany cyklu życia aplikacji Dzięki temu możemy zapisać notatkę, gdy aplikacja jest w tle lub nieaktywna
+  late quill.QuillController _controller; // Kontroler Quill do edycji notatki
+  late Note _note; // Obiekt notatki, który będzie edytowany
 
   @override
-  void initState() {
+  void initState() { // Metoda wywoływana przy inicjalizacji widgetu Inicjalizuje stan i kontroler Quill
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     final box = Hive.box<Note>('notes');
@@ -37,26 +37,28 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) { /* Metoda wywoływana przy zmianie stanu cyklu życia aplikacji
+     Jeśli aplikacja jest w tle lub nieaktywna, zapisujemy notatkę
+     To pozwala na zapisanie zmian, gdy użytkownik opuszcza aplikację */
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       _persistNote();
     }
   }
 
   @override
-  void dispose() {
+  void dispose() { // Metoda wywoływana przy usuwaniu widgetu Zapisujemy notatkę przed usunięciem widgetu
     _persistNote();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  void _persistNote() {
+  void _persistNote() { // Metoda do zapisywania notatki w bazie Hive Konwertuje dokument Quill na JSON i zapisuje w polu docJson notatki
     final json = jsonEncode(_controller.document.toDelta().toJson());
     _note.docJson = json;
     _note.save();
   }
 
-  void _saveNote() {
+  void _saveNote() { // Metoda wywoływana przy kliknięciu przycisku zapisu
     _persistNote();
     Navigator.of(context).pop();
   }
@@ -76,16 +78,24 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       body: Column(
         children: [
           // pasek narzędzi edytora
-          quill.QuillSimpleToolbar(
+          quill.QuillSimpleToolbar( // Pasek narzędzi Quill do formatowania tekstu
             controller: _controller,
-            config: const quill.QuillSimpleToolbarConfig(),
+            config: const quill.QuillSimpleToolbarConfig( //  Konfiguracja paska narzędzi
+              showAlignmentButtons: true,
+              showBackgroundColorButton: false,
+              showBoldButton: true,
+              showInlineCode: true,
+              showLink: false,
+              showColorButton: true,
+              showHeaderStyle: true,
+            ),
           ),
-          Expanded(
-            child: Container(
+          Expanded( // Rozszerza kontener, aby zajął całą dostępną przestrzeń
+            child: Container(  // Kontener dla edytora Quill
               padding: const EdgeInsets.all(8.0),
-              child: quill.QuillEditor.basic(
-                controller: _controller,
-                config: const quill.QuillEditorConfig(),
+              child: quill.QuillEditor.basic( // Edytor Quill do edycji notatki
+                controller: _controller, // Przekazuje kontroler Quill
+                config: const quill.QuillEditorConfig(), // Konfiguracja edytora
               ),
             ),
           ),

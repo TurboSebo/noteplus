@@ -26,7 +26,7 @@ String docJson;  // Quill JSON: zapisuje strukturę dokumentu
 @HiveField(5) 
 String? audioPath;  // ścieżka do pliku nagrania, null jeśli brak
 
-  Note({
+  Note({ // Konstruktor klasy Note
     required this.id,
     required this.notebookId,
     required this.title,
