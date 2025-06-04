@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 
 import '../models/note.dart';
 
-class NoteDetailScreen extends StatefulWidget {
+class NoteDetailScreen extends StatefulWidget { //Tworzy ekran szczegółów notatki stateful widget, ponieważ będziemy edytować notatkę i potrzebujemy stanu do przechowywania kontrolera Quill oraz obiektu notatki
   final String noteId; // ID notatki do wyświetlenia/edycji
   final String notebookId; // ID notatnika
   const NoteDetailScreen(
@@ -24,11 +24,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> // Stan dla ekranu 
 
   @override
   void initState() { // Metoda wywoływana przy inicjalizacji widgetu Inicjalizuje stan i kontroler Quill
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    final box = Hive.box<Note>('notes');
-    _note = box.values.firstWhere((n) => n.id == widget.noteId);
-    final docJson = jsonDecode(_note.docJson);
+    super.initState(); // Wywołanie metody initState z klasy nadrzędnej jest to wymagane, aby poprawnie zainicjalizować stan widgetu
+    WidgetsBinding.instance.addObserver(this); // Dodaje obserwatora cyklu życia aplikacji, aby móc reagować na zmiany stanu aplikacji (np. przejście do tła)
+    final box = Hive.box<Note>('notes'); // Otwiera pudełko Hive z notatkami
+    _note = box.values.firstWhere((n) => n.id == widget.noteId); // Pobiera notatkę o podanym ID z pudełka Hive
+    final docJson = jsonDecode(_note.docJson); // Dekoduje JSON z pola docJson notatki, który zawiera strukturę dokumentu Quill
     final document = quill.Document.fromJson(docJson);
     _controller = quill.QuillController(
       document: document,
@@ -48,19 +48,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> // Stan dla ekranu 
   @override
   void dispose() { // Metoda wywoływana przy usuwaniu widgetu Zapisujemy notatkę przed usunięciem widgetu
     _persistNote();
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this); // Usuwa obserwatora cyklu życia aplikacji, aby uniknąć wycieków pamięci
     super.dispose();
   }
 
   void _persistNote() { // Metoda do zapisywania notatki w bazie Hive Konwertuje dokument Quill na JSON i zapisuje w polu docJson notatki
-    final json = jsonEncode(_controller.document.toDelta().toJson());
+    final json = jsonEncode(_controller.document.toDelta().toJson()); //Konwertuje dokument Quill na Delta, a następnie na JSON, ponieważ Hive przechowuje dane w formacie JSON
     _note.docJson = json;
     _note.save();
   }
 
   void _saveNote() { // Metoda wywoływana przy kliknięciu przycisku zapisu
     _persistNote();
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(); // Zamykamy ekran notatki po zapisaniu
   }
 
   @override

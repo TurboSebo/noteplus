@@ -6,19 +6,18 @@ import 'screens/note_detail_screen.dart';
 /* Funkcja generateRoute służy do generowania tras (nawigacji) w aplikacji.
 MaterialApp korzysta z tej funkcji, aby wiedzieć, jaki ekran wyświetlić na podstawie nazwy trasy. */
 RouteFactory generateRoute = (settings) {
-  switch (settings.name) { // settings.name zawiera nazwę trasy, którą chcemy wyświetlić. Używamy instrukcji switch, aby obsłużyć różne ścieżki.
-    case '/':   // Gdy nazwa trasy to '/' (domyślna, główna strona), zwracamy MaterialPageRoute, która buduje ekran HomeScreen.
+  switch (settings.name) { // settings.name zawiera nazwę trasy, którą chcemy wyświetlić. Używa instrukcji switch, aby obsłużyć różne ścieżki.
+    case '/':   // Gdy nazwa trasy to '/' (domyślna, główna strona), zwraca MaterialPageRoute, która buduje ekran HomeScreen.
       return MaterialPageRoute(
         builder: (context) => const HomeScreen(),
       );
     case '/notes':
-      final notebookId = settings.arguments as String; // Dla trasy '/notes' oczekujemy, że przekazany zostanie argument - identyfikator notatnika. rzutujemy argument na typ String.  
-      return MaterialPageRoute( // Zwracamy MaterialPageRoute, która buduje ekran NotesScreen, przekazując notebookId.
+      final notebookId = settings.arguments as String; // Dla trasy '/notes' oczekuje, że przekazany zostanie argument - identyfikator notatnika. rzutujemy argument na typ String.  
+      return MaterialPageRoute( // Zwraca MaterialPageRoute, która buduje ekran NotesScreen, przekazując notebookId.
         builder: (context) => NotesScreen(notebookId: notebookId),
       );
     case '/note':
-      // Dla trasy '/note' oczekujemy przekazania obu parametrów: noteId i notebookId
-      final args = settings.arguments as Map<String, String>;
+      final args = settings.arguments as Map<String, String>; // Dla trasy '/note' oczekuje, że przekazane zostaną argumenty w postaci mapy z identyfikatorem notatki i notatnika.
       final noteId = args['noteId']!;
       final notebookId = args['notebookId']!;
       return MaterialPageRoute(

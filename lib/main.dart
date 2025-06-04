@@ -15,7 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();   // Zapewnia dostęp do metod Fluttera przed uruchomieniem UI
 
   // Inicjalizuje Hive i dodaje adaptory dla zapisów w lokalnej bazie
-  await Hive.initFlutter();
+  await Hive.initFlutter(); // Inicjalizuje Hive z integracją Fluttera
   Hive.registerAdapter(NotebookAdapter());  // Adapter dla notatników
   Hive.registerAdapter(NoteAdapter());      // Adapter dla notatek
   Hive.registerAdapter(BlockTypeAdapter()); // Adapter dla typu bloku Quill
@@ -28,7 +28,7 @@ void main() async {
   runApp(   // Uruchamiamy aplikację, dostarczając rootowi stan NotebooksModel
     ChangeNotifierProvider( // ChangeNotifierProvider – pozwala na dostęp do modelu w całej aplikacji
       create: (_) => NotebooksModel(),     // Tworzymy instancję modelu notatników
-      child: const MainApp(),               // Nasz główny widget aplikacji
+      child: const MainApp(),               //  główny widget aplikacji
     ),
   );
 }
@@ -40,14 +40,12 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // Delegaci tłumaczeń dla widgetów Material, Cupertino i Quill
-      localizationsDelegates: const [
+      localizationsDelegates: const [ // Delegaci lokalizacji dla tłumaczeń i formatowania
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         FlutterQuillLocalizations.delegate,
       ],
-      // Lista wspieranych języków
       supportedLocales: const [
         Locale('en'),
       ],
@@ -56,7 +54,6 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,           // Główny kolor aplikacji
       ),
-      // Możesz też ustawić home: lub initialRoute:, jeśli nie używasz onGenerateRoute
     );
   }
 }

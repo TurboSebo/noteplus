@@ -11,13 +11,13 @@ class NotesModel extends ChangeNotifier {
   NotesModel({
     required String notebookId,
     required Box<Note> notesBox,
-  }) : _notebookId = notebookId,
+  }) : _notebookId = notebookId, 
        _notesBox = notesBox;
 
-  List<Note> get notes => _notesBox.values
-      .where((note) => note.notebookId == _notebookId)
-      .toList()
-    ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  List<Note> get notes => _notesBox.values // Pobiera wszystkie notatki z pudełka Hive
+      .where((note) => note.notebookId == _notebookId) // Filtruje notatki, aby zwrócić tylko te z odpowiednim notebookId
+      .toList() // Konwertuje Iterable do List
+    ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sortuje notatki malejąco według daty utworzenia
 
   void addNote(String title) {
     final note = Note.create(_notebookId, title);
@@ -33,15 +33,14 @@ class NotesModel extends ChangeNotifier {
     note.save();
     notifyListeners();
   }
-  /// Dodaje notatkę głosową z podaną ścieżką i tytułem
-  void addVoiceNote(String filePath, String title) {
-    final note = Note.create(_notebookId, title);
-    note.audioPath = filePath;
-    _notesBox.add(note);
+  void addVoiceNote(String filePath, String title) {   // Dodaje notatkę głosową z podaną ścieżką i tytułem
+    final note = Note.create(_notebookId, title); // Inicjalizuje nową notatkę z unikatowym ID i tytułem
+    note.audioPath = filePath; // Ustawia ścieżkę audio na podaną
+    _notesBox.add(note); // Dodaje notatkę do pudełka Hive
     notifyListeners();
   }
   void deleteVoiceNote(Note note) {
-    note.audioPath = null; // lub inna logika usuwania
+    note.audioPath = null; // Usuwa ścieżkę audio, ale nie usuwa samej notatki
     note.save();
     notifyListeners();
   }

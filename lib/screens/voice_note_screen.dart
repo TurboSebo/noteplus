@@ -7,9 +7,9 @@ import 'package:provider/provider.dart';      // Provider – zarządzanie stane
 import '../providers/notes_model.dart';       // Model dodający notatki do Hive
 
 // StatefulWidget, bo stan nagrywania (_isRecording) się zmienia
-class VoiceNoteScreen extends StatefulWidget {
+class VoiceNoteScreen extends StatefulWidget { // Ekran do nagrywania notatek głosowych stateful widget, ponieważ jego stan (nagrywanie) może się zmieniać
   final String notebookId;  // ID notatnika, do którego dodane zostanie nagranie
-  const VoiceNoteScreen({Key? key, required this.notebookId}) : super(key: key);
+  const VoiceNoteScreen({Key? key, required this.notebookId}) : super(key: key); // Konstruktor z wymaganym ID notatnika
 
   @override
   _VoiceNoteScreenState createState() => _VoiceNoteScreenState(); // Stan dla VoiceNoteScreen
@@ -44,7 +44,7 @@ class _VoiceNoteScreenState extends State<VoiceNoteScreen> { // Stan dla VoiceNo
       final path = await _recorder.stop();  // Zatrzymuje nagrywanie i pobiera ścieżkę do pliku
       setState(() => _isRecording = false); 
       if (path != null) { 
-        final titleController = TextEditingController();
+        final titleController = TextEditingController(); // Kontroler tekstu do wpisania tytułu notatki głosowej
         final title = await showDialog<String>( // Pokazuje dialog z polem tekstowym do wpisania tytułu
           context: context, // Kontekst do wyświetlenia dialogu
           builder: (ctx) => AlertDialog( // Buduje dialog z polem tekstowym
@@ -59,16 +59,16 @@ class _VoiceNoteScreenState extends State<VoiceNoteScreen> { // Stan dla VoiceNo
             ],
           ),
         );
-        if (title != null && title.isNotEmpty) { // Jeśli tytuł nie jest pusty, dodajemy notatkę
-          context.read<NotesModel>().addVoiceNote(path, title); // Dodaje notatkę głosową do modelu
+        if (title != null && title.isNotEmpty) { // Jeśli tytuł nie jest pusty, dodana zostaje notatka do modelu
+          context.read<NotesModel>().addVoiceNote(path, title); 
         }
       }
-      Navigator.of(context).pop(); // Zamykamy ekran nagrywania
+      Navigator.of(context).pop(); // Zamyka ekran nagrywania
     } else {
       if (await _ensureMicPermission()) { // Sprawdza zgodę na mikrofon
         final dir = await getApplicationDocumentsDirectory(); // Pobiera katalog dokumentów aplikacji
         final filePath ='${dir.path}/${DateTime.now().millisecondsSinceEpoch}.m4a'; // Generuje unikalną nazwę pliku na podstawie czasu 
-        await _recorder.start( // Rozpoczyna nagrywanie
+        await _recorder.start( // await: to służy do wstrzymywania wykonywania funkcji asynchronicznej do momentu zakończenia operacji wywoływanej przez _recorder.start().  Dzięki temu możemy uzyskać wynik tej operacji przed kontynuacją dalszego wykonania kodu.
           const RecordConfig(encoder: AudioEncoder.aacLc), // Ustawienia nagrywania: kodek AAC LC
           path: filePath, // Ścieżka do pliku nagrania
         );
